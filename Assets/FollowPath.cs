@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class FollowPath : MonoBehaviour
-{
+public class FollowPath : MonoBehaviour {
 
     Transform goal;
     float speed = 5.0f;
@@ -15,35 +12,41 @@ public class FollowPath : MonoBehaviour
     int currentWP = 0;
     Graph g;
 
-    void Start()
-    {
+    void Start() {
 
         wps = wpManager.GetComponent<WPManager>().waypoints;
         g = wpManager.GetComponent<WPManager>().graph;
         currentNode = wps[7];
     }
 
-    public void GoToHeli()
-    {
+    public void GoToHeli() {
         g.AStar(currentNode, wps[4]);
         currentWP = 0;
     }
 
-    public void GoToRuin()
-    {
+    public void GoToRuin() {
         g.AStar(currentNode, wps[0]);
         currentWP = 0;
     }
 
-    public void GoBehindHeli()
-    {
-
+    public void GoBehindHeli() {
         g.AStar(currentNode, wps[11]);
         currentWP = 0;
     }
 
-    void LateUpdate()
+    public void FUEL()
     {
+        g.AStar(currentNode, wps[1]);
+        currentWP = 0;
+    }
+
+    public void BASE()
+    {
+        g.AStar(currentNode, wps[12]);
+        currentWP = 0;
+    }
+
+    void LateUpdate() {
 
         if (g.getPathLength() == 0 || currentWP == g.getPathLength())
             return;
@@ -52,22 +55,16 @@ public class FollowPath : MonoBehaviour
 
         if (Vector3.Distance(
             g.getPathPoint(currentWP).transform.position,
-            transform.position) < accuracy)
-        {
+            transform.position) < accuracy) {
             currentWP++;
         }
 
-        if (currentWP < g.getPathLength())
-        {
+        if (currentWP < g.getPathLength()) {
             goal = g.getPathPoint(currentWP).transform;
-            Vector3 lookAtGoal = new Vector3(goal.position.x,
-                                            this.transform.position.y,
-                                            goal.position.z);
+            Vector3 lookAtGoal = new Vector3(goal.position.x,this.transform.position.y,goal.position.z);
             Vector3 direction = lookAtGoal - this.transform.position;
 
-            this.transform.rotation = Quaternion.Slerp(this.transform.rotation,
-                                                    Quaternion.LookRotation(direction),
-                                                    Time.deltaTime * rotSpeed);
+            this.transform.rotation = Quaternion.Slerp(this.transform.rotation,Quaternion.LookRotation(direction),Time.deltaTime * rotSpeed);
 
             this.transform.Translate(0, 0, speed * Time.deltaTime);
         }
